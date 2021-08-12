@@ -24,7 +24,7 @@ spec:
           name: mvn-pipeline
         workspaces:
           - name: maven-settings
-            emptyDir: { }
+            emptyDir: {}
           - name: pipeline-shared-data
             volumeClaimTemplate:
               spec:
