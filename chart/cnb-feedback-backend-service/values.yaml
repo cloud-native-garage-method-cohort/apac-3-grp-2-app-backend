@@ -1,24 +1,8 @@
-dev:
-  mongodb:
-    # install simple deployment of mongoDB (for dev only)
-    enable: true
-    image: "mongo:4.4.6"
-    serviceAccount: default
-common:
-  clusterDomain: "ibmcloud-roks-8s3d9-8946bbc006b7c6eb0829d088919818bb-0000.hkg02.containers.appdomain.cloud"
-  ingressSecretName: ""
-  ingressClass: ""
-  secrets:
-    mongodb:
-      url:
-        key: "MONGODB_CONNECTIONSTRING"
-        value: "mongodb://mongo:27017"
-      # workaround
-      host:
-        key: "SPRING_DATA_MONGODB_HOST"
-        value: "mongo"
+mongodb:
+  host: "mongo"
+  port: "27017"
+  database: "cnb"
 
-# Follow default toolchain
 image:
   repository: quay.io/arief_hidayat/apac-3-grp-2-feedback-backend-service
   tag: 0.0.1

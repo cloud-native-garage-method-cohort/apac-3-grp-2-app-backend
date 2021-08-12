@@ -1,62 +1,32 @@
 {{- with .Values.app -}}
-{{ if and  (eq .expose "oc-route") $.Values.common.clusterDomain }}
+{{ if eq .expose "oc-route" }}
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
   annotations:
     "helm.sh/hook": post-install,post-upgrade
   labels:
-    app: {{.name}}
-  name: {{.name}}
+    app: {{$.Release.Name}}
+  name: {{$.Release.Name}}
 spec:
-  host: {{ printf "%s-%s.%s" .name $.Release.Name $.Values.common.clusterDomain }}
   port:
     targetPort: tcp
   to:
     kind: Service
-    name: {{.name}}
+    name: {{$.Release.Name}}
     weight: 100
   tls:
     termination: edge
   wildcardPolicy: None
 ---
 {{ end }}
-{{ if and  (eq .expose "ingress") $.Values.common.clusterDomain }}
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: {{.name}}
-  {{ if $.Values.common.ingressClass }}
-  annotations:
-    kubernetes.io/ingress.class: {{ $.Values.common.ingressClass }}
-  {{ end }}
-spec:
-  {{ if $.Values.common.ingressSecretName }}
-  tls:
-    - hosts:
-        - {{ printf "%s-%s.%s" .name $.Release.Name $.Values.common.clusterDomain }}
-      secretName: {{$.Values.common.ingressSecretName}}
-  {{ end }}
-  rules:
-    - host: {{ printf "%s-%s.%s" .name $.Release.Name $.Values.common.clusterDomain }}
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: {{.name }}
-                port:
-                  number: 80
----
-{{ end }}
 kind: Service
 apiVersion: v1
 metadata:
-  name: {{.name }}
+  name: {{$.Release.Name}}
 spec:
   selector:
-    app: {{.name }}
+    app: {{$.Release.Name}}
   type: ClusterIP
   ports:
     - port: 80
@@ -68,17 +38,17 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: {{.name }}
-  name: {{.name }}
+    app: {{$.Release.Name}}
+  name: {{$.Release.Name}}
 spec:
   replicas: {{.replicas }}
   selector:
     matchLabels:
-      app: {{.name }}
+      app: {{$.Release.Name}}
   template:
     metadata:
       labels:
-        app: {{.name }}
+        app: {{$.Release.Name}}
     spec:
       containers:
         - name: app
@@ -90,7 +60,7 @@ spec:
           {{ end }}
           envFrom:
           - secretRef:
-              name: mongodb
+              name: mongodb-{{.Release.Name}}
           ports:
             - containerPort: {{.containerPort}}
               protocol: TCP

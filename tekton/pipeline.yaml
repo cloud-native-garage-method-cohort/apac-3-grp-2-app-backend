@@ -19,9 +19,6 @@ spec:
     - name: app-name
       type: string
       description: Application name
-    - name: mongo-connection
-      type: string
-      description: mongo connection
   workspaces:
     - name: pipeline-shared-data
       description: |
@@ -81,11 +78,25 @@ spec:
         - name: charts_dir
           value: chart/cnb-feedback-backend-service
         - name: release_name
-          value: cnb-feedback-backend-service
+          value: "$(params.app-name)-$(tasks.clone-repository.results.commit)"
         - name: release_namespace
           value: "$(context.pipelineRun.namespace)"
         - name: overwrite_values
-          value: "common.secrets.mongodb.url.value=$(params.mongo-connection),app.name=$(params.app-name),image.repository=$(params.image-repo),image.tag=$(tasks.clone-repository.results.commit)"
+          value: "mongodb.database=db-$(tasks.clone-repository.results.commit),app.name=$(params.app-name),image.repository=$(params.image-repo),image.tag=$(tasks.clone-repository.results.commit)"
       workspaces:
         - name: source
           workspace: pipeline-shared-data
+    - name: gitops
+      taskRef:
+        kind: Task
+        name: commit-helm-chart
+      params:
+        - name: app-name
+          value: "$(params.app-name)"
+        - name: sha
+          value: "$(tasks.clone-repository.results.commit)"
+      workspaces:
+        - name: source
+          workspace: pipeline-shared-data
+      runAfter:
+        - helm-install
