@@ -20,16 +20,21 @@ rules:
     verbs:
       - get
       - create
+      - list
       - patch
+      - watch
   - apiGroups:
       - ""
     resources:
       - services
       - secrets
+      - configmaps
     verbs:
       - get
-      - patch
       - create
+      - list
+      - patch
+      - watch
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
