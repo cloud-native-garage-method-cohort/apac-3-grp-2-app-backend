@@ -11,7 +11,6 @@ import org.springframework.context.annotation.Configuration;
 		MongoAutoConfiguration.class,
 		MongoDataAutoConfiguration.class
 })
-@Configuration
 public class FeedbackBackendApplication {
 
 	public static void main(String[] args) {
