@@ -45,6 +45,8 @@ spec:
       params:
         - name: CONTEXT_DIR
           value: "."
+        - name: MAVEN_IMAGE
+          value: "maven:3.8.1-adoptopenjdk-16-openj9"
         - name: GOALS
           value:
             - clean
@@ -75,8 +77,6 @@ spec:
       params:
         - name: charts_dir
           value: chart/cnb-feedback-backend-service
-        - name: releases_version
-          value: "$(tasks.clone-repository.results.commit)"
         - name: release_name
           value: cnb-feedback-backend-service
         - name: release_namespace

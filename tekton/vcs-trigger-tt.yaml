@@ -10,19 +10,21 @@ spec:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: express-sample-app-pipeline-
+        generateName: mvn-pipeline-run-
       spec:
-        serviceAccountName: build-bot
-        pipelineRef:
-          name: nodejs-pipeline
         params:
           - name: source-repo
-            value: $(tt.params.source-repo)
+            value: https://github.com/cloud-native-garage-method-cohort/apac-3-grp-2-app-backend
           - name: image-repo
-            value: quay.io/arief_hidayat/express-sample-app
+            value: quay.io/arief_hidayat/apac-3-grp-2-feedback-backend-service
           - name: app-name
-            value: express-sample-app
+            value: feedback-backend-service
+        serviceAccountName: build-bot
+        pipelineRef:
+          name: mvn-pipeline
         workspaces:
+          - name: maven-settings
+            emptyDir: { }
           - name: pipeline-shared-data
             volumeClaimTemplate:
               spec:

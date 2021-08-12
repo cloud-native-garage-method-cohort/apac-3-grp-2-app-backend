@@ -25,6 +25,7 @@ rules:
       - ""
     resources:
       - services
+      - secrets
     verbs:
       - get
       - patch
