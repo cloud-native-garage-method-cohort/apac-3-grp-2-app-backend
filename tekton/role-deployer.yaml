@@ -14,6 +14,7 @@ rules:
       - list
       - patch
       - watch
+      - delete
   - apiGroups:
       - route.openshift.io
     resources:
@@ -24,6 +25,7 @@ rules:
       - list
       - patch
       - watch
+      - delete
   - apiGroups:
       - ""
     resources:
@@ -36,6 +38,7 @@ rules:
       - list
       - patch
       - watch
+      - delete
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
