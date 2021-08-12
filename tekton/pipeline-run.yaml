@@ -10,6 +10,8 @@ spec:
       value: quay.io/arief_hidayat/apac-3-grp-2-feedback-backend-service
     - name: app-name
       value: feedback-backend-service
+    - name: mongo-connection
+      value: "mongodb://mongo:27017"
   serviceAccountName: build-bot
   pipelineRef:
     name: mvn-pipeline

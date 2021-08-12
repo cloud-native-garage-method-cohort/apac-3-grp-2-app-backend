@@ -8,13 +8,12 @@ common:
   clusterDomain: "ibmcloud-roks-8s3d9-8946bbc006b7c6eb0829d088919818bb-0000.hkg02.containers.appdomain.cloud"
   ingressSecretName: ""
   ingressClass: ""
-
   secrets:
     mongodb:
       url:
         key: "MONGODB_CONNECTIONSTRING"
         value: "mongodb://mongo:27017"
-
+# common.secrets.mongodb.url.value=
 # Follow default toolchain
 image:
   repository: quay.io/arief_hidayat/apac-3-grp-2-feedback-backend-service

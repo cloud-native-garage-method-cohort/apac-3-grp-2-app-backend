@@ -19,6 +19,9 @@ spec:
     - name: app-name
       type: string
       description: Application name
+    - name: mongo-connection
+      type: string
+      description: mongo connection
   workspaces:
     - name: pipeline-shared-data
       description: |
@@ -82,7 +85,7 @@ spec:
         - name: release_namespace
           value: "$(context.pipelineRun.namespace)"
         - name: overwrite_values
-          value: "app.name=$(params.app-name),image.repository=$(params.image-repo),image.tag=$(tasks.clone-repository.results.commit)"
+          value: "common.secrets.mongodb.url.value=$(params.mongo-connection),app.name=$(params.app-name),image.repository=$(params.image-repo),image.tag=$(tasks.clone-repository.results.commit)"
       workspaces:
         - name: source
           workspace: pipeline-shared-data
