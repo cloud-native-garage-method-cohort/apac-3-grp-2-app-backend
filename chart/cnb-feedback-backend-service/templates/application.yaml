@@ -60,7 +60,7 @@ spec:
           {{ end }}
           envFrom:
           - secretRef:
-              name: mongodb-{{.Release.Name}}
+              name: mongodb-{{$.Release.Name}}
           ports:
             - containerPort: {{.containerPort}}
               protocol: TCP
