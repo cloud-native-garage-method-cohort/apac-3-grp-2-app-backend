@@ -46,6 +46,12 @@ spec:
           {{ toYaml .Values.dev.mongodb.resources | nindent 12 }}
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
+        volumeMounts:
+          - mountPath: /data/db
+            name: data-volume
+      volumes:
+        - name: data-volume
+          emptyDir: {}
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
