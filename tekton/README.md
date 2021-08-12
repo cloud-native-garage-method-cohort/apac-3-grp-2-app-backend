@@ -17,6 +17,8 @@ EOF
 oc apply -f tekton/gitops-repo-configmap.yaml
 oc apply -f tekton/commit-helm-chart.yaml
 
+oc apply -f mongo-dev.yaml
+
 oc apply -f build-bot-sa.yaml
 oc apply -f role-deployer.yaml
 oc apply -f pipeline.yaml
