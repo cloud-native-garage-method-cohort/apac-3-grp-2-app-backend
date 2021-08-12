@@ -1,11 +1,10 @@
 apiVersion: v1
-name: scdf-backend-service
+name: cnb-feedback-backend-service
 version: 0.0.1
 tillerVersion: ">=2.7.2"
-description: Helm chart for deploying scdf-kafka-backend-service
+description: Helm chart for deploying cnb-feedback-backend-service
 keywords:
-  - scdf-kafka-backend-service
-  - scdf
+  - cnb-feedback-backend-service
 sources:
   - https://github.ibm.com/asean-techgarage/scdf-kafka-backend-service
 engine: gotpl

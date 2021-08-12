@@ -1,0 +1,33 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerTemplate
+metadata:
+  name: vcs-trigger
+spec:
+  params:
+    - name: source-repo
+      description: The git repository url
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1beta1
+      kind: PipelineRun
+      metadata:
+        generateName: express-sample-app-pipeline-
+      spec:
+        serviceAccountName: build-bot
+        pipelineRef:
+          name: nodejs-pipeline
+        params:
+          - name: source-repo
+            value: $(tt.params.source-repo)
+          - name: image-repo
+            value: quay.io/arief_hidayat/express-sample-app
+          - name: app-name
+            value: express-sample-app
+        workspaces:
+          - name: pipeline-shared-data
+            volumeClaimTemplate:
+              spec:
+                accessModes:
+                  - ReadWriteOnce
+                resources:
+                  requests:
+                    storage: 1Gi
