@@ -7,3 +7,9 @@ management:
 mongodb:
   connectionString: mongodb://127.0.0.1:27017
   database: cnb
+spring:
+  data:
+    mongodb:
+      host: 127.0.0.1
+      repositories:
+        type: reactive

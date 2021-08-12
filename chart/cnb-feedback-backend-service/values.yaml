@@ -13,7 +13,11 @@ common:
       url:
         key: "MONGODB_CONNECTIONSTRING"
         value: "mongodb://mongo:27017"
-# common.secrets.mongodb.url.value=
+      # workaround
+      host:
+        key: "SPRING_DATA_MONGODB_HOST"
+        value: "mongo"
+
 # Follow default toolchain
 image:
   repository: quay.io/arief_hidayat/apac-3-grp-2-feedback-backend-service
