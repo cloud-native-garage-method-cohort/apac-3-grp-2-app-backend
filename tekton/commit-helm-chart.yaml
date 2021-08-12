@@ -127,5 +127,6 @@ spec:
         fi
 
         git add chart/
+        git add $ENV
         git commit -m "update ${APP_NAME} helm chart to commit ${SHA}"
         git push
