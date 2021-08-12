@@ -90,18 +90,7 @@ spec:
           {{ end }}
           envFrom:
           - secretRef:
-              name: kafka
-          - secretRef:
               name: mongodb
-          - secretRef:
-              name: weather-api
-          env:
-          - name: SPRING_PROFILES_ACTIVE
-            value: {{.activeProfiles}}
-          - name: INCIDENT_UPDATE_SCHEDULER_CRON
-            value: {{.cronJob.incidentUpdate}}
-          - name: JSON_PROPERTY_NAMING_STRATEGY
-            value: {{.json.property.naming.strategy}}
           ports:
             - containerPort: {{.containerPort}}
               protocol: TCP
