@@ -10,6 +10,7 @@ rules:
       - replicasets
     verbs:
       - get
+      - update
       - create
       - list
       - patch
@@ -21,6 +22,7 @@ rules:
       - routes
     verbs:
       - get
+      - update
       - create
       - list
       - patch
@@ -34,6 +36,7 @@ rules:
       - configmaps
     verbs:
       - get
+      - update
       - create
       - list
       - patch
