@@ -1,0 +1,45 @@
+dev:
+  mongodb:
+    enable: false
+  mongoExpress:
+    enable: false
+  kafka:
+    enable: false
+common:
+  clusterDomain: "techgarage-4667f5c54a9fa16798873d0072267a42-0000.sng01.containers.appdomain.cloud"
+  secrets:
+    kafka:
+      bootstrapServers:
+        key: "SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS"
+        value: "my-cluster-kafka-bootstrap.kafka.svc:9092"
+      inspectionChannel:
+        key: "SPRING_CLOUD_STREAM_BINDINGS_INSPECTION_IN_0_DESTINATION"
+        value: "scdf-incident-events"
+      inspectionGroup:
+        key: "SPRING_CLOUD_STREAM_BINDINGS_INSPECTION_IN_0_GROUP"
+        value: "scdf"
+      incidentChannel:
+        key: "SPRING_CLOUD_STREAM_BINDINGS_INCIDENT_IN_0_DESTINATION"
+        value: "scdf-incident-events"
+      incidentGroup:
+        key: "SPRING_CLOUD_STREAM_BINDINGS_INCIDENT_IN_0_GROUP"
+        value: "scdf"
+    weatherApi:
+      apiKey:
+        value: "29244201b19a4508a44201b19ad508c1"
+    #    googleApi:
+    #      apiKey:
+    #        key: "GOOGLE_API_KEY"
+    #        value: "change-me"
+    mongodb:
+      url:
+        key: "MONGODB_CONNECTIONSTRING"
+        # can create your own db https://mongo-express-scdf.techgarage-4667f5c54a9fa16798873d0072267a42-0000.sng01.containers.appdomain.cloud/
+        value: "mongodb://mongodb-dev-svc.mongodb:27017/scdf"
+#        # created 'scdf' db from mongo operator http://ops-mongodb.techgarage-4667f5c54a9fa16798873d0072267a42-0000.sng01.containers.appdomain.cloud/v2/60d1f42ec1da8d503b060620#deployment/topology
+#        value: "mongodb://my-mongodb-replicaset-2.my-mongodb-replicaset-svc.mongodb.svc.cluster.local:27017/scdf?retryWrites=true&w=majority&tls=true&tlsInsecure=true"
+app:
+  expose: "oc-route"
+
+
+

@@ -1,0 +1,127 @@
+{{- with .Values.app -}}
+{{ if and  (eq .expose "oc-route") $.Values.common.clusterDomain }}
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+  labels:
+    app: {{.name}}
+  name: {{.name}}
+spec:
+  host: {{ printf "%s-%s.%s" .name $.Release.Name $.Values.common.clusterDomain }}
+  port:
+    targetPort: tcp
+  to:
+    kind: Service
+    name: {{.name}}
+    weight: 100
+  tls:
+    termination: edge
+  wildcardPolicy: None
+---
+{{ end }}
+{{ if and  (eq .expose "ingress") $.Values.common.clusterDomain }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{.name}}
+  {{ if $.Values.common.ingressClass }}
+  annotations:
+    kubernetes.io/ingress.class: {{ $.Values.common.ingressClass }}
+  {{ end }}
+spec:
+  {{ if $.Values.common.ingressSecretName }}
+  tls:
+    - hosts:
+        - {{ printf "%s-%s.%s" .name $.Release.Name $.Values.common.clusterDomain }}
+      secretName: {{$.Values.common.ingressSecretName}}
+  {{ end }}
+  rules:
+    - host: {{ printf "%s-%s.%s" .name $.Release.Name $.Values.common.clusterDomain }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{.name }}
+                port:
+                  number: 80
+---
+{{ end }}
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{.name }}
+spec:
+  selector:
+    app: {{.name }}
+  type: ClusterIP
+  ports:
+    - port: 80
+      name: tcp
+      targetPort: {{.containerPort}}
+      protocol: TCP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: {{.name }}
+  name: {{.name }}
+spec:
+  replicas: {{.replicas }}
+  selector:
+    matchLabels:
+      app: {{.name }}
+  template:
+    metadata:
+      labels:
+        app: {{.name }}
+    spec:
+      containers:
+        - name: app
+          image: {{ $.Values.image.repository }}:{{ $.Values.image.tag }}
+          imagePullPolicy: {{.imagePullPolicy | default "IfNotPresent"}}
+          {{ if .resources }}
+          resources:
+            {{ toYaml .resources | nindent 12 }}
+          {{ end }}
+          envFrom:
+          - secretRef:
+              name: kafka
+          - secretRef:
+              name: mongodb
+          - secretRef:
+              name: weather-api
+          env:
+          - name: SPRING_PROFILES_ACTIVE
+            value: {{.activeProfiles}}
+          - name: INCIDENT_UPDATE_SCHEDULER_CRON
+            value: {{.cronJob.incidentUpdate}}
+          - name: JSON_PROPERTY_NAMING_STRATEGY
+            value: {{.json.property.naming.strategy}}
+          ports:
+            - containerPort: {{.containerPort}}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: {{.containerPort}}
+            initialDelaySeconds: 15
+            failureThreshold: 10
+            periodSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: {{.containerPort}}
+            initialDelaySeconds: 15
+            failureThreshold: 10
+            periodSeconds: 3
+      restartPolicy: Always
+      {{ if $.Values.image.pullSecret }}
+      imagePullSecrets:
+        - name: {{ $.Values.image.pullSecret }}
+      {{ end }}
+{{- end -}}

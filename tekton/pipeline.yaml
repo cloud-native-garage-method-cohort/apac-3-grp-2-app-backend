@@ -1,0 +1,98 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  annotations:
+    app.openshift.io/runtime: nodejs
+  labels:
+    app: nodejs-pipeline
+    app.kubernetes.io/instance: nodejs-pipeline-instance
+    app.kubernetes.io/name: nodejs-pipeline
+  name: nodejs-pipeline
+spec:
+  params:
+    - name: source-repo
+      type: string
+      description: Source git repository
+    # - name: commit
+    #   type: string
+    #   description: The precise SHA of the most recent commit
+    #   default: ""
+    - name: image-repo
+      type: string
+      description: Docker image name
+    - name: app-name
+      type: string
+      description: Application name
+  workspaces:
+    - name: pipeline-shared-data
+      description: |
+        This workspace stores the cloned repository and is available to all steps
+  tasks:
+    - name: clone-repository
+      taskRef:
+        kind: ClusterTask
+        name: git-clone
+      params:
+        - name: url
+          value: "$(params.source-repo)"
+      workspaces:
+        - name: output
+          workspace: pipeline-shared-data
+    - name: run-tests
+      taskRef:
+        name: npm
+      workspaces:
+        - name: source
+          workspace: pipeline-shared-data
+      params:
+        - name: ARGS
+          value:
+          - install-ci-test
+      runAfter:
+        - clone-repository
+    - name: build-image
+      taskRef:
+        kind: ClusterTask
+        name: buildah
+      runAfter:
+        - run-tests
+      params:
+        - name: IMAGE
+          value: "$(params.image-repo):$(tasks.clone-repository.results.commit)"
+      workspaces:
+        - name: source
+          workspace: pipeline-shared-data
+    - name: kustomize
+      taskRef:
+        kind: Task
+        name: kustomize
+      runAfter:
+        - build-image
+      params:
+        - name: source-repo
+          value: "$(params.source-repo)"
+        - name: commit
+          value: "$(tasks.clone-repository.results.commit)"
+        - name: app-name
+          value: "$(params.app-name)"
+        - name: app-namespace
+          value: "$(context.pipelineRun.namespace)"
+        - name: image-repo
+          value: "$(params.image-repo)"
+      workspaces:
+        - name: source
+          workspace: pipeline-shared-data
+    - name: try-to-deploy
+      taskRef:
+        kind: Task
+        name: try-to-deploy
+      params:
+        - name: app-name
+          value: "$(params.app-name)"
+        - name: app-namespace
+          value: "$(context.pipelineRun.namespace)"
+      workspaces:
+        - name: source
+          workspace: pipeline-shared-data
+      runAfter:
+        - kustomize

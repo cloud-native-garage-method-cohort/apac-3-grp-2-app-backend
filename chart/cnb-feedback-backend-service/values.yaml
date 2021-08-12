@@ -1,0 +1,83 @@
+
+dev:
+  mongodb:
+    # install simple deployment of mongoDB (for dev only)
+    enable: true
+    image: "mongo:4.4.6"
+  mongoExpress:
+    # install simple deployment of mongo-express (for dev only)
+    enable: true
+    expose: ingress
+    image: "mongo-express:1.0.0-alpha"
+  kafka:
+    # install simple deployment of kafka (for dev only)
+    enable: true
+    image: "landoop/fast-data-dev:cp3.3.0"
+    resources:
+      requests:
+        memory: "1Gi"
+      limits:
+        memory: "4Gi"
+common:
+  clusterDomain: ""
+  ingressSecretName: ""
+  ingressClass: ""
+
+  secrets:
+    kafka:
+      bootstrapServers:
+        key: "SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS"
+        value: "kafka-cluster:9092"
+#      inspectionChannel:
+#        key: "SPRING_CLOUD_STREAM_BINDINGS_INSPECTION_IN_0_DESTINATION"
+#        # TODO: should we rename this to scdf-ppe-inspection-events
+#        value: "scdf-incident-events"
+#      inspectionGroup:
+#        key: "SPRING_CLOUD_STREAM_BINDINGS_INSPECTION_IN_0_GROUP"
+#        value: "scdf"
+#      incidentChannel:
+#        key: "SPRING_CLOUD_STREAM_BINDINGS_INCIDENT_IN_0_DESTINATION"
+#        value: "scdf-incidents"
+    weatherApi:
+      apiKey:
+        key: "WEATHER_API_KEY"
+        value: "change-me"
+#    googleApi:
+#      apiKey:
+#        key: "GOOGLE_API_KEY"
+#        value: "change-me"
+    mongodb:
+      url:
+        key: "MONGODB_CONNECTIONSTRING"
+        value: "mongodb://mongo:27017"
+
+# Follow default toolchain
+image:
+  repository: jp.icr.io/enterprise-application/mvn3-jdk16-spring-kafka-backend-service
+  tag: 0.0.1
+  pullSecret: all-icr-io
+app:
+  cronJob:
+    incidentUpdate: "0 0/5 * * * *"
+  json:
+    property:
+      naming:
+        strategy: CAMEL_CASE
+  activeProfiles: dev
+  name: backend-service
+  imagePullPolicy: Always
+  replicas: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 512Mi
+    limits:
+      cpu: 1
+      memory: 1Gi
+  # 'ingress', 'oc-route', or "none"
+  expose: "ingress"
+  containerPort: "8080"
+
+
+
+  
