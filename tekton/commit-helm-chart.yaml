@@ -10,6 +10,8 @@ spec:
       description: name of the app
     - name: sha
       description: sha of the current commit
+    - name: env
+      description: prod, pre-prod, integration, staging
   workspaces:
     - name: source
       description: contains the cloned git repo
@@ -91,6 +93,7 @@ spec:
 
         APP_NAME="$(params.app-name)"
         SHA="$(params.sha)"
+        ENV="$(params.env)"
 
         BRANCH_CMD=""
         if [[ -n "${GIT_BRANCH}" ]]; then
@@ -111,14 +114,18 @@ spec:
         git clone ${BRANCH_CMD} ${GIT_URL} gitops_cd
         cd gitops_cd
 
-        mkdir -p charts/
-        cp -r ../source/chart/ charts/
+        cp -r ../source/chart/ .
+        mkdir -p $ENV
+        cat <<EOT >> $ENV/feedback-backend-values.yaml
+        image:
+          tag: $SHA
+        EOT
 
         if [[ $(git status -s | wc -l) -eq 0 ]]; then
           echo "No changes"
           exit 0
         fi
 
-        git add charts/
+        git add chart/
         git commit -m "update ${APP_NAME} helm chart to commit ${SHA}"
         git push

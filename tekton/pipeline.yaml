@@ -93,6 +93,8 @@ spec:
       params:
         - name: app-name
           value: "$(params.app-name)"
+        - name: env
+          value: prod
         - name: sha
           value: "$(tasks.clone-repository.results.commit)"
       workspaces:
