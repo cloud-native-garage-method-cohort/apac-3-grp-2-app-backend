@@ -3,6 +3,7 @@ dev:
     # install simple deployment of mongoDB (for dev only)
     enable: true
     image: "mongo:4.4.6"
+    serviceAccount: mongo
 
 common:
   clusterDomain: "ibmcloud-roks-8s3d9-8946bbc006b7c6eb0829d088919818bb-0000.hkg02.containers.appdomain.cloud"

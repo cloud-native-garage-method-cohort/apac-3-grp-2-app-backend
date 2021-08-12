@@ -32,8 +32,6 @@ spec:
     type: RollingUpdate
   template:
     metadata:
-      annotations:
-        openshift.io/scc: privileged
       labels:
         app: mongo
     spec:
@@ -52,6 +50,7 @@ spec:
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext: {}
+      serviceAccountName: {{ .Values.dev.mongodb.serviceAccount }}
       terminationGracePeriodSeconds: 30
 ---
 {{ end }}
