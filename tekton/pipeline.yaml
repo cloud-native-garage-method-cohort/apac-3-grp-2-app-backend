@@ -4,19 +4,15 @@ metadata:
   annotations:
     app.openshift.io/runtime: nodejs
   labels:
-    app: nodejs-pipeline
-    app.kubernetes.io/instance: nodejs-pipeline-instance
-    app.kubernetes.io/name: nodejs-pipeline
-  name: nodejs-pipeline
+    app: mvn-pipeline
+    app.kubernetes.io/instance: mvn-pipeline-instance
+    app.kubernetes.io/name: mvn-pipeline
+  name: mvn-pipeline
 spec:
   params:
     - name: source-repo
       type: string
       description: Source git repository
-    # - name: commit
-    #   type: string
-    #   description: The precise SHA of the most recent commit
-    #   default: ""
     - name: image-repo
       type: string
       description: Docker image name
@@ -27,6 +23,9 @@ spec:
     - name: pipeline-shared-data
       description: |
         This workspace stores the cloned repository and is available to all steps
+    - name: maven-settings
+      description: |
+        this is for maven settings
   tasks:
     - name: clone-repository
       taskRef:
@@ -38,61 +37,52 @@ spec:
       workspaces:
         - name: output
           workspace: pipeline-shared-data
-    - name: run-tests
+    - name: maven-run
       taskRef:
-        name: npm
-      workspaces:
-        - name: source
-          workspace: pipeline-shared-data
-      params:
-        - name: ARGS
-          value:
-          - install-ci-test
+        name: maven
       runAfter:
         - clone-repository
+      params:
+        - name: CONTEXT_DIR
+          value: "."
+        - name: GOALS
+          value:
+            - clean
+            - package
+      workspaces:
+        - name: maven-settings
+          workspace: maven-settings
+        - name: source
+          workspace: pipeline-shared-data
     - name: build-image
       taskRef:
         kind: ClusterTask
         name: buildah
       runAfter:
-        - run-tests
+        - maven-run
       params:
         - name: IMAGE
           value: "$(params.image-repo):$(tasks.clone-repository.results.commit)"
       workspaces:
         - name: source
           workspace: pipeline-shared-data
-    - name: kustomize
+    - name: helm-install
       taskRef:
         kind: Task
-        name: kustomize
+        name: helm-upgrade-from-source
       runAfter:
         - build-image
       params:
-        - name: source-repo
-          value: "$(params.source-repo)"
-        - name: commit
+        - name: charts_dir
+          value: chart/cnb-feedback-backend-service
+        - name: releases_version
           value: "$(tasks.clone-repository.results.commit)"
-        - name: app-name
-          value: "$(params.app-name)"
-        - name: app-namespace
+        - name: release_name
+          value: cnb-feedback-backend-service
+        - name: release_namespace
           value: "$(context.pipelineRun.namespace)"
-        - name: image-repo
-          value: "$(params.image-repo)"
+        - name: overwrite_values
+          value: "app.name=$(params.app-name),image.repository=$(params.image-repo),image.tag=$(tasks.clone-repository.results.commit)"
       workspaces:
         - name: source
           workspace: pipeline-shared-data
-    - name: try-to-deploy
-      taskRef:
-        kind: Task
-        name: try-to-deploy
-      params:
-        - name: app-name
-          value: "$(params.app-name)"
-        - name: app-namespace
-          value: "$(context.pipelineRun.namespace)"
-      workspaces:
-        - name: source
-          workspace: pipeline-shared-data
-      runAfter:
-        - kustomize
