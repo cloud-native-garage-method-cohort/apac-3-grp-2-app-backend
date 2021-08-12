@@ -2,8 +2,6 @@ create project
 ```
 export PROJECT=grp-2-backend-cicd
 oc new-project $PROJECT
-oc create serviceaccount mongo
-oc adm policy add-scc-to-user privileged system:serviceaccount:$PROJECT:mongo
 
 oc apply -f build-bot-sa.yaml
 oc apply -f role-deployer.yaml
