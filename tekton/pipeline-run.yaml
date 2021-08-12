@@ -9,7 +9,7 @@ spec:
     - name: image-repo
       value: quay.io/arief_hidayat/apac-3-grp-2-feedback-backend-service
     - name: app-name
-      value: feedback-backend
+      value: backend-svc
   serviceAccountName: build-bot
   pipelineRef:
     name: mvn-pipeline

@@ -1,4 +1,3 @@
-{{ if .Values.dev.mongodb.enable }}
 kind: Service
 apiVersion: v1
 metadata:
@@ -36,19 +35,17 @@ spec:
         app: mongo
     spec:
       containers:
-      - image: {{.Values.dev.mongodb.image}}
-        imagePullPolicy: IfNotPresent
-        name: mongo
-        ports:
-        - containerPort: 27017
-          protocol: TCP
-        resources:
-          {{ toYaml .Values.dev.mongodb.resources | nindent 12 }}
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
-        volumeMounts:
-          - mountPath: /data/db
-            name: data-volume
+        - image: mongo:4.4.6
+          imagePullPolicy: IfNotPresent
+          name: mongo
+          ports:
+            - containerPort: 27017
+              protocol: TCP
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+            - mountPath: /data/db
+              name: data-volume
       volumes:
         - name: data-volume
           emptyDir: {}
@@ -56,7 +53,4 @@ spec:
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext: {}
-      serviceAccountName: {{ .Values.dev.mongodb.serviceAccount }}
       terminationGracePeriodSeconds: 30
----
-{{ end }}
