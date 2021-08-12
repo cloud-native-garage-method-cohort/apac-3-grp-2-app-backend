@@ -9,5 +9,4 @@ class FeedbackBackendApplicationTests {
 	@Test
 	void contextLoads() {
 	}
-
 }
